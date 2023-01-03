@@ -80,8 +80,7 @@ contract Dploma {
     function createTemplate(
         string memory _title,
         string memory _name,
-        string
-memory _date,
+        string memory _date,
         string[] memory _specs
     ) public returns (bytes32) {
         // Increment the template counter
@@ -158,8 +157,7 @@ memory _date,
             msg.sender,
             _certified_pub_adress,
             Certified(_cfied_firstname, _cfied_lastname, _cfied_birthdate),
-            Certifier(_cfier_name, _cfier_ad
-ress),
+            Certifier(_cfier_name, _cfier_adress),
             Template(_title, _name, _date, _specs)
         );
         // Set the certification to be visible
@@ -234,8 +232,7 @@ ress),
     {
         // Retrieve the certification data from the map
         Certification storage certif = map_cert[_idCert];
-        // Check if the certification is set to
-be visible
+        // Check if the certification is set tobe visible
         if (studentVisibility[_idCert]) {
             // Return the certification data
             return certif;
@@ -263,4 +260,3 @@ be visible
         emit evtVisisbility("The visibility of the certification has been changed.");
     }
 }
-
