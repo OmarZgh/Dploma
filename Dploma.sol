@@ -170,6 +170,7 @@ contract Dploma {
         string memory _date,
         string[] memory _specs
     ) public {
+       require(map_cert[_hashCert].dip_addr_certifier == msg.sender);
         setTemplateTitle(_hashCert, _title);
         setTemplateName(_hashCert, _name);
         setTemplateDate(_hashCert, _date);
