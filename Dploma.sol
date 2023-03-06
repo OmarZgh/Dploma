@@ -34,10 +34,10 @@ contract Dploma {
     mapping(bytes32 => Template) private map_temp;
     mapping(bytes32 => Certified) private unvisibleCertified;
     mapping(bytes32 => bool) private studentVisibility;
-    uint256 templateId = 0;
+    uint256 private templateId = 0;
 
-    event evtTemplate(bytes32);
-    event certifCreation(bytes32);
+    event evtTemplate(string, bytes32);
+    event certifCreation(string, bytes32);
     event modificationMsg(string);
     event evtVisisbility(string);
     event deletedCertif(string);
@@ -58,7 +58,7 @@ contract Dploma {
         bytes32 hashTemplate = keccak256(abi.encode(templateId));
         map_temp[hashTemplate] = Template(_title, _name, _date, _specs);
 
-        emit evtTemplate(hashTemplate);
+        emit evtTemplate("Template access key", hashTemplate);
         return hashTemplate;
     }
 
@@ -90,7 +90,7 @@ contract Dploma {
             temp
         );
         studentVisibility[idCert] = true;
-        emit certifCreation(idCert);
+        emit certifCreation("Certification access key", idCert);
         return idCert;
     }
 
@@ -117,11 +117,11 @@ contract Dploma {
             Template(_title, _name, _date, _specs)
         );
         studentVisibility[idCert] = true;
-        emit certifCreation(idCert);
+        emit certifCreation("Certification access key", idCert);
         return idCert;
     }
 
-    Certified unknowCertifed = Certified("unknown", "unknown", "unknown");
+    Certified unknowCertifed = Certified("hidden", "hidden", "hidden");
 
     function toggleStudentVisibility(bytes32 _hashCert) public {
         require(map_cert[_hashCert].dip_addr_certified == msg.sender);
