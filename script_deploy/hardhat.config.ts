@@ -2,18 +2,21 @@
  * @type import('hardhat/config').HardhatUserConfig
  */
 
-require("@nomiclabs/hardhat-ethers");
-const API_URL :string = "https://eth-goerli.g.alchemy.com/v2/GoPk5qRGiHAo9EUXOvUquXJFW-MsRg5i"
-const PRIVATE_KEY :string = "PRIVATE KEY"
+import { config as dotEnvConfig } from "dotenv";
+dotEnvConfig({ path: "./.env"});
 
+require("@nomiclabs/hardhat-ethers");
+// const API_URL  = "https://eth-sepolia.g.alchemy.com/v2/P6zmb6lMhjRLlQKIgIFcSZ8zuG-Q2Sq0"
+const PRIVATE_KEY  = process.env.PRIVATE_KEY
+const API_URL=process.env.API_URL;
 module.exports = {
   solidity: "0.8.3",
-  defaultNetwork: "goerli",
+  defaultNetwork: "sepolia",
   networks: {
-    goerli: {
+    sepolia: {
       url: API_URL,
       accounts: [`0x${PRIVATE_KEY}`],
-      chainId: 5
+      chainId: 11155111
     }
   },
 }
