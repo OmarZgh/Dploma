@@ -2,20 +2,20 @@
 
 pragma solidity >=0.7.0 <0.9.0;
 
-contract Dploma {
+contract Diploma {
     struct Certification {
         address certAddrCertifier;
         address certAddrCertified;
         Certified certCertified;
-        Certifier certCedrtifier;
+        Certifier certCertifier;
         Template certTemplate;
     }
 
     struct Template {
         string tempTitle;
         string tempName;
-        string tempDate;
-        string[] tempSpec;
+        uint256 tempDate; // Stocker la date sous forme de timestamp Unix
+        string[] tempSpecs;
     }
 
     struct Certified {
@@ -26,7 +26,7 @@ contract Dploma {
 
     struct Certifier {
         string cfierName;
-        string cfierPhysicalAdress;
+        string cfierPhysicalAddress;
     }
 
     mapping(bytes32 => Certification) private mapCert;
@@ -38,145 +38,143 @@ contract Dploma {
     event evtTemplate(string, bytes32);
     event evtCertifCreation(string, bytes32);
     event evtModificationMsg(string);
-    event evtCertifiedVisisbility(string);
+    event evtCertifiedVisibility(string);
     event evtDeletedCertif(string);
 
-    function createhashOwner(address addrS) private view returns (bytes32) {
+    function createHashOwner(address addrS) private view returns (bytes32) {
         return keccak256(abi.encode(msg.sender, addrS, block.timestamp));
     }
 
     function createTemplate(
-        string memory tempTitle,
-        string memory tempName,
-        string memory tempDate,
-        string[] memory tempSpecs
+        string memory _tempTitle,
+        string memory _tempName,
+        uint256 _tempDate,
+        string[] memory _tempSpecs
     ) public returns (bytes32) {
         templateId += 1;
-        bytes32 hashTemplate = keccak256(abi.encode(templateId));
-        mapTemp[hashTemplate] = Template(tempTitle, tempName, tempDate, tempSpecs);
+        bytes32 _hashTemplate = keccak256(abi.encode(templateId));
 
-        emit evtTemplate("Template access key", hashTemplate);
-        return hashTemplate;
+        mapTemp[_hashTemplate] = Template(_tempTitle, _tempName, _tempDate, _tempSpecs);
+
+        emit evtTemplate("Template access key", _hashTemplate);
+        return _hashTemplate;
     }
 
-    function getTemplate(bytes32 hashTemplate)
-        private
-        view
-        returns (Template memory)
+    function getTemplate(bytes32 _hashTemplate)
+    private
+    view
+    returns (Template memory)
     {
-        return mapTemp[hashTemplate];
+        return mapTemp[_hashTemplate];
     }
 
     function insertWithTemplate(
-        string memory cfiedFirstname,
-        string memory cfiedLastname,
-        string memory cfiedBirthdate,
-        string memory cfierName,
-        string memory cfierAdress,
-        bytes32 hashTemplate,
-        address certifiedPubAdress
+        string memory _cfiedFirstname,
+        string memory _cfiedLastname,
+        string memory _cfiedBirthdate,
+        string memory _cfierName,
+        string memory _cfierAdress,
+        bytes32 _hashTemplate,
+        address _certifiedPubAddress
     ) public returns (bytes32) {
-        bytes32 idCert = createhashOwner(certifiedPubAdress);
-        Template memory temp = getTemplate(hashTemplate);
-        mapCert[idCert] = Certification(
+        bytes32 _idCert = createHashOwner(_certifiedPubAddress);
+        Template memory _temp = getTemplate(_hashTemplate);
+        mapCert[_idCert] = Certification(
             msg.sender,
-            certifiedPubAdress,
-            Certified(cfiedFirstname, cfiedLastname, cfiedBirthdate),
-            Certifier(cfierName, cfierAdress),
-            temp
+            _certifiedPubAddress,
+            Certified(_cfiedFirstname, _cfiedLastname, _cfiedBirthdate),
+            Certifier(_cfierName, _cfierAdress),
+            _temp
         );
-        studentVisibility[idCert] = true;
-        emit evtCertifCreation("Certification access key", idCert);
-        return idCert;
+        studentVisibility[_idCert] = true;
+        emit evtCertifCreation("Certification access key", _idCert);
+        return _idCert;
     }
 
     function insertWithoutTemplate(
-        string memory cfiedFirstname,
-        string memory cfiedLastname,
-        string memory cfiedBirthdate,
-        string memory cfierName,
-        string memory cfierPhysicalAdress,
-        address certifiedPubAdress,
-        string memory temptitle,
-        string memory tempName,
-        string memory tempDate,
-        string[] memory tempSpecs
+        string memory _cfiedFirstname,
+        string memory _cfiedLastname,
+        string memory _cfiedBirthdate,
+        string memory _cfierName,
+        string memory _cfierPhysicalAddress,
+        address _certifiedPubAddress,
+        string memory _tempTitle,
+        string memory _tempName,
+        uint256 _tempDate,
+        string[] memory _tempSpecs
     ) public returns (bytes32) {
-        bytes32 idCert = createhashOwner(certifiedPubAdress);
-
-        //data insertion
-        mapCert[idCert] = Certification(
+        bytes32 _idCert = createHashOwner(_certifiedPubAddress);
+        // Data insertion
+        mapCert[_idCert] = Certification(
             msg.sender,
-            certifiedPubAdress,
-            Certified(cfiedFirstname, cfiedLastname, cfiedBirthdate),
-            Certifier(cfierName, cfierPhysicalAdress),
-            Template(temptitle, tempName, tempDate, tempSpecs)
+            _certifiedPubAddress,
+            Certified(_cfiedFirstname, _cfiedLastname, _cfiedBirthdate),
+            Certifier(_cfierName, _cfierPhysicalAddress),
+            Template(_tempTitle, _tempName, _tempDate, _tempSpecs)
         );
-        studentVisibility[idCert] = true;
-        emit evtCertifCreation("Certification access key", idCert);
-        return idCert;
+        studentVisibility[_idCert] = true;
+        emit evtCertifCreation("Certification access key", _idCert);
+        return _idCert;
     }
 
-    Certified unknowCertifed = Certified("hidden", "hidden", "hidden");
+    Certified private unknownCertified = Certified("hidden", "hidden", "hidden");
 
-    function toggleStudentVisibility(bytes32 hashCert) public {
-        require(mapCert[hashCert].certAddrCertifier == msg.sender);
-        studentVisibility[hashCert] = !studentVisibility[hashCert];
-        emit evtCertifiedVisisbility("Certified public visbility has changed");
+    function toggleStudentVisibility(bytes32 _hashCert) public {
+        require(mapCert[_hashCert].certAddrCertifier == msg.sender);
+        studentVisibility[_hashCert] = !studentVisibility[_hashCert];
+        emit evtCertifiedVisibility("Certified public visibility has changed");
     }
 
-    function getCertification(bytes32 hashCert)
-        public
-        view
-        returns (Certification memory)
+    function getCertification(bytes32 _hashCert)
+    public
+    view
+    returns (Certification memory)
     {
-        Certification memory cert = mapCert[hashCert];
-        if (!studentVisibility[hashCert]) {
-            cert.certCertified = unknowCertifed;
+        Certification memory _cert = mapCert[_hashCert];
+        if (!studentVisibility[_hashCert]) {
+            _cert.certCertified = unknownCertified;
         }
-        return cert;
+        return _cert;
     }
 
-    function setTemplateTitle(bytes32 hashCert, string memory title) private {
-        Certification storage cert = mapCert[hashCert];
-        cert.certTemplate.tempTitle = title;
+    function setTemplateTitle(bytes32 _hashCert, string memory _title) private {
+        Certification storage _cert = mapCert[_hashCert];
+        _cert.certTemplate.tempTitle = _title;
     }
 
-    function setTemplateName(bytes32 hashCert, string memory name) private {
-        Certification storage cert = mapCert[hashCert];
-        cert.certTemplate.tempName = name;
+    function setTemplateName(bytes32 _hashCert, string memory _name) private {
+        Certification storage _cert = mapCert[_hashCert];
+        _cert.certTemplate.tempName = _name;
     }
 
-    function setTemplateDate(bytes32 hashCert, string memory date) private {
-        Certification storage cert = mapCert[hashCert];
-        cert.certTemplate.tempDate = date;
+    function setTemplateDate(bytes32 _hashCert, uint256 _tempDate) private {
+        Certification storage _cert = mapCert[_hashCert];
+        _cert.certTemplate.tempDate = _tempDate;
     }
 
-    function setTemplateSpecs(bytes32 hashCert, string[] memory specs)
-        private
-    {
-        Certification storage cert = mapCert[hashCert];
-        cert.certTemplate.tempSpec = specs;
+    function setTemplateSpecs(bytes32 _hashCert, string[] memory _specs) private {
+        Certification storage _cert = mapCert[_hashCert];
+        _cert.certTemplate.tempSpecs = _specs;
     }
 
-    function ModifyTemplate(
-        bytes32 hashCert,
-        string memory tempTitle,
-        string memory tempName,
-        string memory tempDate,
-        string[] memory tempSpecs
+    function modifyTemplate(
+        bytes32 _hashCert,
+        string memory _tempTitle,
+        string memory _tempName,
+        uint256 _tempDate,
+        string[] memory _tempSpecs
     ) public {
-        require(mapCert[hashCert].certAddrCertifier == msg.sender);
-        setTemplateTitle(hashCert, tempTitle);
-        setTemplateName(hashCert, tempName);
-        setTemplateDate(hashCert, tempDate);
-        setTemplateSpecs(hashCert, tempSpecs);
+        require(mapCert[_hashCert].certAddrCertifier == msg.sender);
+        setTemplateTitle(_hashCert, _tempTitle);
+        setTemplateName(_hashCert, _tempName);
+        setTemplateDate(_hashCert, _tempDate);
+        setTemplateSpecs(_hashCert, _tempSpecs);
 
         emit evtModificationMsg("Certification data has been modified");
     }
 
-    function DeleteCertif(bytes32 hashCert) public {
-        require(mapCert[hashCert].certAddrCertifier == msg.sender);
-        delete mapCert[hashCert];
+    function deleteCertif(bytes32 _hashCert) public {
+        require(mapCert[_hashCert].certAddrCertifier == msg.sender);
+        delete mapCert[_hashCert];
     }
 }
